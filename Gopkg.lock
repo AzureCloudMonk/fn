@@ -143,7 +143,7 @@
     "internal/jsonmessage",
     "internal/term"
   ]
-  revision = "050dda146355762a475b0e0db58ce82fde85d5bc"
+  revision = "623c4c4b51ec7507502197470dbfbcf77ae877b3"
 
 [[projects]]
   name = "github.com/garyburd/redigo"
