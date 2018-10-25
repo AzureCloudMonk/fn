@@ -11,7 +11,7 @@ export MYSQL_URL=$(spawn_mysql ${CONTEXT})
 export MINIO_URL=$(spawn_minio ${CONTEXT})
 export FN_DS_DB_PING_MAX_RETRIES=60
 
-go test -v $(go list ./... | \
+go test -mod=vendor -v $(go list ./... | \
     grep -v vendor | \
     grep -v examples | \
     grep -v test/fn-api-tests | \
