@@ -1,22 +1,23 @@
+export GO111MODULE=on
 # Just builds
 .PHONY: dep
 dep:
-	dep ensure --vendor-only
+	go mod download; go mod vendor -v
 
 .PHONY: dep-up
 dep-up:
-	dep ensure
+	go mod tidy
 
 .PHONY: build
 build:
-	go build -o fnserver ./cmd/fnserver 
+	go build -mod=vendor -o fnserver ./cmd/fnserver 
 
 .PHONY: generate
 generate: api/agent/grpc/runner.pb.go
 
 .PHONY: install
 install:
-	go build -o ${GOPATH}/bin/fnserver ./cmd/fnserver 
+	go build -mod=vendor -o ${GOPATH}/bin/fnserver ./cmd/fnserver 
 
 .PHONY: checkfmt
 checkfmt:
@@ -51,11 +52,11 @@ fn-test-utils: checkfmt
 
 .PHONY: test-middleware
 test-middleware: test-basic
-	cd examples/middleware && go build
+	cd examples/middleware && go build -mod=vendor
 
 .PHONY: test-extensions
 test-extensions: test-basic
-	cd examples/extensions && go build
+	cd examples/extensions && go build -mod=vendor
 
 .PHONY: test-basic
 test-basic: checkfmt pull-images fn-test-utils fn-status-checker
@@ -95,11 +96,11 @@ pull-images: img-hello img-mysql img-postgres img-minio img-busybox
 
 .PHONY: test-datastore
 test-datastore:
-	cd api/datastore && go test -v ./...
+	cd api/datastore && go test -mod=vendor -v ./...
 
 .PHONY: test-log-datastore
 test-log-datastore:
-	cd api/logs && go test -v ./...
+	cd api/logs && go test -v -mod=vendor ./...
 
 .PHONY: test-build-arm
 test-build-arm:
@@ -129,8 +130,8 @@ docker-test:
 	-v /var/run/docker.sock:/var/run/docker.sock \
 	-v ${CURDIR}:/go/src/github.com/fnproject/fn \
 	-w /go/src/github.com/fnproject/fn \
-	fnproject/go:dev go test \
-	-v $(shell docker run --rm -ti -v ${CURDIR}:/go/src/github.com/fnproject/fn -w /go/src/github.com/fnproject/fn -e GOPATH=/go golang:alpine sh -c 'go list ./... | \
+	fnproject/go:dev go test -mod=vendor \
+	-v $(shell docker run --rm -ti -v ${CURDIR}:/go/src/github.com/fnproject/fn -w /go/src/github.com/fnproject/fn -e GO111MODULE=on -e GOPATH=/go golang:alpine sh -c 'go list ./... | \
                                                                                                                                                           grep -v vendor | \
                                                                                                                                                           grep -v examples | \
                                                                                                                                                           grep -v test/fn-api-tests | \
